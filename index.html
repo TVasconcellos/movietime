@@ -5,33 +5,37 @@
   <meta charset="UTF-8">
   <title>Countdown</title>
 
-  <!-- Roboto 700 -->
+  <!-- Load Roboto font with weight 700 -->
 
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
 
   <style>
+    /* Reset default browser styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* Full screen setup */
     body {
       height: 100vh;
       overflow: hidden;
       font-family: 'Roboto', sans-serif;
     }
 
+    /* Background image with extra size for parallax movement */
     .background {
       position: absolute;
-      width: 120%;
-      height: 120%;
-      top: -10%;
-      left: -10%;
-      background: url('https://preview.redd.it/new-poster-for-mortal-kombat-ii-v0-vtztr88yjolg1.jpeg?width=1080&crop=smart&auto=webp&s=5a8460d4af5d5261f6c737d634a432a373446225') no-repeat center center/cover;
+      width: 130%;
+      height: 130%;
+      top: -15%;
+      left: -15%;
+      background: url('https://preview.redd.it/new-poster-for-mortal-kombat-ii-v0-vtztr88yjolg1.jpeg?width=1080&crop=smart&auto=webp&s=5a8460d4af5d5261f6c737d634a432a373446225') no-repeat center 20% / cover;
       will-change: transform;
     }
 
+    /* Dark overlay for readability */
     .overlay {
       position: absolute;
       width: 100%;
@@ -39,6 +43,7 @@
       background: rgba(0, 0, 0, 0.6);
     }
 
+    /* Centered content container */
     .countdown {
       position: relative;
       z-index: 2;
@@ -51,26 +56,30 @@
       text-align: center;
     }
 
+    /* Timer styling */
     #timer {
-      font-size: 5rem;
+      font-size: 4.5rem;
       font-weight: 700;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       text-shadow: 0 0 20px rgba(0,0,0,0.8);
+      line-height: 1.4;
     }
 
+    /* Subtitle text */
     .label {
       margin-top: 10px;
       font-size: 1.5rem;
       opacity: 0.85;
     }
 
+    /* Play/Stop button */
     .play-btn {
       margin-top: 25px;
       padding: 12px 28px;
       font-size: 1.2rem;
       font-weight: 700;
       color: white;
-      background: rgba(255, 0, 0, 0.8);
+      background: black;
       border: none;
       border-radius: 6px;
       cursor: pointer;
@@ -78,61 +87,95 @@
     }
 
     .play-btn:hover {
-      background: rgba(255, 0, 0, 1);
       transform: scale(1.05);
+      background: #111;
     }
   </style>
 
 </head>
 <body>
 
+<!-- Background image -->
+
 <div class="background" id="bg"></div>
+
+<!-- Dark overlay -->
+
 <div class="overlay"></div>
+
+<!-- Main content -->
 
 <div class="countdown">
   <div id="timer">Loading...</div>
   <div class="label">UNTIL RELEASE</div>
-  <button class="play-btn" onclick="startMusic()">PLAY MUSIC</button>
+  <button class="play-btn" onclick="toggleMusic()" id="musicBtn">PLAY MUSIC</button>
 </div>
+
+<!-- Audio element (your mp3 file) -->
 
 <audio id="bgMusic" loop>
   <source src="mkscene.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-  // 🎬 Release date
+  /* =========================
+     🎬 COUNTDOWN TIMER
+  ========================= */
+
+  // Set release date (May 7, 2026 at 19:00)
   const releaseDate = new Date("2026-05-07T19:00:00");
 
   function updateTimer() {
     const now = new Date();
     const diff = releaseDate - now;
 
+    // If date passed
     if (diff <= 0) {
       document.getElementById("timer").innerHTML = "NOW PLAYING";
       return;
     }
 
+    // Time calculations
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
     const seconds = Math.floor((diff / 1000) % 60);
 
+    // Display with full words (Portuguese)
     document.getElementById("timer").innerHTML =
-      `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      `${days} dias<br>${hours} horas<br>${minutes} minutos<br>${seconds} segundos`;
   }
 
+  // Update every second
   setInterval(updateTimer, 1000);
   updateTimer();
 
-  // 🎵 Play button
+
+  /* =========================
+     🎵 MUSIC CONTROL
+  ========================= */
+
   const audio = document.getElementById("bgMusic");
+  const button = document.getElementById("musicBtn");
+
+  // Set volume to 20%
   audio.volume = 0.2;
 
-  function startMusic() {
-    audio.play();
+  function toggleMusic() {
+    if (audio.paused) {
+      audio.play();
+      button.innerText = "STOP MUSIC";
+    } else {
+      audio.pause();
+      button.innerText = "PLAY MUSIC";
+    }
   }
 
-  // 🖱️ Smooth parallax with easing
+
+  /* =========================
+     🖱️ SMOOTH PARALLAX
+  ========================= */
+
   const bg = document.getElementById("bg");
 
   let targetX = 0;
@@ -140,22 +183,26 @@
   let currentX = 0;
   let currentY = 0;
 
+  // Track mouse movement → set target position
   document.addEventListener("mousemove", (e) => {
-    targetX = (e.clientX / window.innerWidth - 0.5) * 40;
-    targetY = (e.clientY / window.innerHeight - 0.5) * 40;
+    targetX = (e.clientX / window.innerWidth - 0.5) * 80;
+    targetY = (e.clientY / window.innerHeight - 0.5) * 80;
   });
 
   function animate() {
-    // easing
-    currentX += (targetX - currentX) * 0.05;
-    currentY += (targetY - currentY) * 0.05;
+    // Smooth easing towards target
+    currentX += (targetX - currentX) * 0.04;
+    currentY += (targetY - currentY) * 0.04;
 
-    bg.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.08)`;
+    // Apply movement + slight zoom
+    bg.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.1)`;
 
     requestAnimationFrame(animate);
   }
 
+  // Start animation loop
   animate();
+
 </script>
 
 </body>
