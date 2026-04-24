@@ -24,12 +24,12 @@
 
     .background {
       position: absolute;
-      width: 110%;
-      height: 110%;
-      top: -5%;
-      left: -5%;
+      width: 120%;
+      height: 120%;
+      top: -10%;
+      left: -10%;
       background: url('https://preview.redd.it/new-poster-for-mortal-kombat-ii-v0-vtztr88yjolg1.jpeg?width=1080&crop=smart&auto=webp&s=5a8460d4af5d5261f6c737d634a432a373446225') no-repeat center center/cover;
-      transition: transform 0.1s ease-out;
+      will-change: transform;
     }
 
     .overlay {
@@ -63,6 +63,24 @@
       font-size: 1.5rem;
       opacity: 0.85;
     }
+
+    .play-btn {
+      margin-top: 25px;
+      padding: 12px 28px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: white;
+      background: rgba(255, 0, 0, 0.8);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .play-btn:hover {
+      background: rgba(255, 0, 0, 1);
+      transform: scale(1.05);
+    }
   </style>
 
 </head>
@@ -74,16 +92,15 @@
 <div class="countdown">
   <div id="timer">Loading...</div>
   <div class="label">UNTIL RELEASE</div>
+  <button class="play-btn" onclick="startMusic()">PLAY MUSIC</button>
 </div>
 
-<!-- Background Music -->
-
-<audio id="bgMusic" autoplay loop>
+<audio id="bgMusic" loop>
   <source src="mkscene.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-  // 🎬 Release date: May 7, 2026 at 19:00
+  // 🎬 Release date
   const releaseDate = new Date("2026-05-07T19:00:00");
 
   function updateTimer() {
@@ -101,30 +118,44 @@
     const seconds = Math.floor((diff / 1000) % 60);
 
     document.getElementById("timer").innerHTML =
-      `${days} : ${hours} : ${minutes} : ${seconds}`;
+      `${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 
   setInterval(updateTimer, 1000);
   updateTimer();
 
-  // 🖱️ Parallax effect
-  const bg = document.getElementById("bg");
-
-  document.addEventListener("mousemove", (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 20;
-    const y = (e.clientY / window.innerHeight - 0.5) * 20;
-
-    bg.style.transform = `translate(${x}px, ${y}px) scale(1.05)`;
-  });
-
-  // 🔊 Set volume to 20%
+  // 🎵 Play button
   const audio = document.getElementById("bgMusic");
   audio.volume = 0.2;
 
-  // ⚠️ Autoplay fallback (some browsers require interaction)
-  document.addEventListener("click", () => {
+  function startMusic() {
     audio.play();
-  }, { once: true });
+  }
+
+  // 🖱️ Smooth parallax with easing
+  const bg = document.getElementById("bg");
+
+  let targetX = 0;
+  let targetY = 0;
+  let currentX = 0;
+  let currentY = 0;
+
+  document.addEventListener("mousemove", (e) => {
+    targetX = (e.clientX / window.innerWidth - 0.5) * 40;
+    targetY = (e.clientY / window.innerHeight - 0.5) * 40;
+  });
+
+  function animate() {
+    // easing
+    currentX += (targetX - currentX) * 0.05;
+    currentY += (targetY - currentY) * 0.05;
+
+    bg.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.08)`;
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 </script>
 
 </body>
