@@ -125,8 +125,8 @@
     */
     .label {
       margin-top: 20px;
-      font-size: 1.5rem;
-      opacity: 0.85;
+      font-size: 2.5rem;
+      opacity: 0.0;
     }
 
     /*
@@ -159,8 +159,8 @@
 
 <div class="countdown">
   <div id="timer"></div>
-  <div class="label">PARA IRMOS VER</div>
-  <button class="play-btn" onclick="toggleMusic()" id="musicBtn">PLAY MUSIC</button>
+  <div class="label">PARA IRMOS VER O MORTAL KOMBAT 2</div>
+  <button class="play-btn" onclick="toggleMusic()" id="musicBtn">PLAY</button>
 </div>
 
 <audio id="bgMusic" loop>
@@ -254,10 +254,10 @@
   function toggleMusic() {
     if (audio.paused) {
       audio.play();
-      button.innerText = "STOP MUSIC";
+      button.innerText = "STOP";
     } else {
       audio.pause();
-      button.innerText = "PLAY MUSIC";
+      button.innerText = "PLAY";
     }
   }
 
