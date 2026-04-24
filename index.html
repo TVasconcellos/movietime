@@ -1,41 +1,59 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
   <title>Countdown</title>
 
-  <!-- Load Roboto font with weight 700 -->
-
+  <!-- 
+    Loads Roboto font from Google Fonts.
+    wght@700 = bold weight.
+    You can change to 400 (normal) or add more weights if needed.
+  -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset default browser styles */
+    /* 
+      RESET
+      Removes default spacing browsers add.
+      box-sizing: border-box makes width/height include padding.
+    */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    /* Full screen setup */
+    /*
+      BODY SETUP
+      overflow: hidden prevents scrollbars during parallax movement.
+      background: black ensures edges are invisible when image moves.
+    */
     body {
       height: 100vh;
       overflow: hidden;
       font-family: 'Roboto', sans-serif;
+      background: black;
     }
 
-    /* Background image with extra size for parallax movement */
+    /*
+      BACKGROUND IMAGE
+      width/height = 100% → no artificial zoom
+      object-position: top → shows top of image (your request)
+    */
     .background {
       position: absolute;
-      width: 130%;
-      height: 130%;
-      top: -15%;
-      left: -15%;
-      background: url('https://preview.redd.it/new-poster-for-mortal-kombat-ii-v0-vtztr88yjolg1.jpeg?width=1080&crop=smart&auto=webp&s=5a8460d4af5d5261f6c737d634a432a373446225') no-repeat center 20% / cover;
+      width: 100%;
+      height: 100%;
+      background: url('https://preview.redd.it/new-poster-for-mortal-kombat-ii-v0-vtztr88yjolg1.jpeg?width=1080&crop=smart&auto=webp&s=5a8460d4af5d5261f6c737d634a432a373446225') 
+                  no-repeat center top / cover;
       will-change: transform;
     }
 
-    /* Dark overlay for readability */
+    /*
+      OVERLAY
+      Dark layer for readability.
+      Increase/decrease opacity (0.6) to control contrast.
+    */
     .overlay {
       position: absolute;
       width: 100%;
@@ -43,7 +61,10 @@
       background: rgba(0, 0, 0, 0.6);
     }
 
-    /* Centered content container */
+    /*
+      MAIN CONTAINER
+      Flexbox centers everything vertically + horizontally.
+    */
     .countdown {
       position: relative;
       z-index: 2;
@@ -56,23 +77,62 @@
       text-align: center;
     }
 
-    /* Timer styling */
+    /*
+      TIMER GRID
+      Creates 4 columns (days, hours, minutes, seconds)
+      gap controls spacing between boxes.
+    */
     #timer {
-      font-size: 4.5rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-shadow: 0 0 20px rgba(0,0,0,0.8);
-      line-height: 1.4;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
     }
 
-    /* Subtitle text */
+    /*
+      EACH TIME BOX
+      background: rgba(0,0,0,0.1) → 10% opacity (your request)
+      padding controls box size
+      border-radius softens edges
+    */
+    .time-box {
+      background: rgba(0,0,0,0.1);
+      padding: 20px 25px;
+      border-radius: 8px;
+      min-width: 100px;
+    }
+
+    /*
+      NUMBER (big value)
+      font-size controls visual hierarchy
+    */
+    .value {
+      font-size: 3rem;
+      font-weight: 700;
+    }
+
+    /*
+      LABEL (dias, horas, etc)
+      Smaller + slightly transparent for hierarchy
+    */
+    .unit {
+      margin-top: 5px;
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+
+    /*
+      SUBTITLE TEXT
+    */
     .label {
-      margin-top: 10px;
+      margin-top: 20px;
       font-size: 1.5rem;
       opacity: 0.85;
     }
 
-    /* Play/Stop button */
+    /*
+      BUTTON
+      transition makes hover smooth
+    */
     .play-btn {
       margin-top: 25px;
       padding: 12px 28px;
@@ -91,27 +151,17 @@
       background: #111;
     }
   </style>
-
 </head>
 <body>
 
-<!-- Background image -->
-
 <div class="background" id="bg"></div>
-
-<!-- Dark overlay -->
-
 <div class="overlay"></div>
 
-<!-- Main content -->
-
 <div class="countdown">
-  <div id="timer">Loading...</div>
-  <div class="label">UNTIL RELEASE</div>
+  <div id="timer"></div>
+  <div class="label">PARA IRMOS VER</div>
   <button class="play-btn" onclick="toggleMusic()" id="musicBtn">PLAY MUSIC</button>
 </div>
-
-<!-- Audio element (your mp3 file) -->
 
 <audio id="bgMusic" loop>
   <source src="mkscene.mp3" type="audio/mpeg">
@@ -120,45 +170,85 @@
 <script>
   /* =========================
      🎬 COUNTDOWN TIMER
-  ========================= */
+     ========================= */
 
-  // Set release date (May 7, 2026 at 19:00)
+  // Target date
   const releaseDate = new Date("2026-05-07T19:00:00");
 
   function updateTimer() {
     const now = new Date();
     const diff = releaseDate - now;
 
-    // If date passed
     if (diff <= 0) {
       document.getElementById("timer").innerHTML = "NOW PLAYING";
       return;
     }
 
-    // Time calculations
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
+    /*
+      TIME CALCULATION EXPLAINED:
 
-    // Display with full words (Portuguese)
-    document.getElementById("timer").innerHTML =
-      `${days} dias${hours} horas${minutes} minutos${seconds} segundos`;
+      1000 = milliseconds in 1 second
+      60 = seconds in 1 minute
+      60 = minutes in 1 hour
+      24 = hours in 1 day
+
+      We divide the total difference to extract each unit.
+    */
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    const hours = Math.floor(
+      (diff / (1000 * 60 * 60)) % 24
+    );
+
+    const minutes = Math.floor(
+      (diff / (1000 * 60)) % 60
+    );
+
+    const seconds = Math.floor(
+      (diff / 1000) % 60
+    );
+
+    /*
+      TEMPLATE STRUCTURE
+
+      Each block = value + label underneath
+      Easy to reorder, style, or add new units
+    */
+
+    document.getElementById("timer").innerHTML = `
+      <div class="time-box">
+        <div class="value">${days}</div>
+        <div class="unit">dias</div>
+      </div>
+      <div class="time-box">
+        <div class="value">${hours}</div>
+        <div class="unit">horas</div>
+      </div>
+      <div class="time-box">
+        <div class="value">${minutes}</div>
+        <div class="unit">minutos</div>
+      </div>
+      <div class="time-box">
+        <div class="value">${seconds}</div>
+        <div class="unit">segundos</div>
+      </div>
+    `;
   }
 
-  // Update every second
+  // Runs every 1000ms (1 second)
   setInterval(updateTimer, 1000);
   updateTimer();
 
 
   /* =========================
      🎵 MUSIC CONTROL
-  ========================= */
+     ========================= */
 
   const audio = document.getElementById("bgMusic");
   const button = document.getElementById("musicBtn");
 
-  // Set volume to 20%
+  // 0.2 = 20% volume (range is 0 → 1)
   audio.volume = 0.2;
 
   function toggleMusic() {
@@ -173,8 +263,8 @@
 
 
   /* =========================
-     🖱️ SMOOTH PARALLAX
-  ========================= */
+     🖱️ PARALLAX (CLEAN VERSION)
+     ========================= */
 
   const bg = document.getElementById("bg");
 
@@ -183,26 +273,39 @@
   let currentX = 0;
   let currentY = 0;
 
-  // Track mouse movement → set target position
+  /*
+    Mouse position → normalized between -0.5 and +0.5
+    Then multiplied to control intensity (here: 60px)
+
+    Increase 60 → stronger movement
+    Decrease → more subtle
+  */
   document.addEventListener("mousemove", (e) => {
-    targetX = (e.clientX / window.innerWidth - 0.5) * 80;
-    targetY = (e.clientY / window.innerHeight - 0.5) * 80;
+    targetX = (e.clientX / window.innerWidth - 0.5) * 60;
+    targetY = (e.clientY / window.innerHeight - 0.5) * 60;
   });
 
   function animate() {
-    // Smooth easing towards target
-    currentX += (targetX - currentX) * 0.04;
-    currentY += (targetY - currentY) * 0.04;
+    /*
+      EASING EXPLAINED
 
-    // Apply movement + slight zoom
-    bg.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.1)`;
+      0.05 = smoothing factor
+      Lower → slower, smoother movement
+      Higher → snappier movement
+    */
+    currentX += (targetX - currentX) * 0.05;
+    currentY += (targetY - currentY) * 0.05;
+
+    /*
+      Only translate (no scale)
+      This allows image edges to reveal black background
+    */
+    bg.style.transform = `translate(${currentX}px, ${currentY}px)`;
 
     requestAnimationFrame(animate);
   }
 
-  // Start animation loop
   animate();
-
 </script>
 
 </body>
